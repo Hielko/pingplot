@@ -1,5 +1,7 @@
 #!/bin/sh
 
+#Start from rc.local
+
 while sleep 60; do
    DATE=$(date +"%Y-%m-%d")
    FILE="plot2-"$DATE".txt"
