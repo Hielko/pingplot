@@ -110,12 +110,9 @@ function plotPing(pingData, divid) {
     if (dateIsToday) {
         $(titleDivId).html("Vandaag");
         todayBar.push([new Date(), Settings.chartYMax]);
-
     } else {
         $(titleDivId).html(moment(pingData.date).format(dateFormat));
     }
-
-  //  console.log($('#' + divid).width())
 
     if (pingData.data.length == 0) {
         return;
@@ -192,7 +189,7 @@ function start(options) {
     }
 
 
-    function PingAndPlot(pingData) {
+    function GetPingDataAndPlot(pingData) {
         getPingData(pingData.date, pingData, function (context, response) {
             parsePingData(response, context);
             plotPing(context, context.divid);
@@ -200,7 +197,7 @@ function start(options) {
 
         if (!options.disableRefresh && isToday(pingData.date)) {
             setTimeout(function () {
-                PingAndPlot(pingData);
+                GetPingDataAndPlot(pingData);
             }, 60 * 1000);
         }
     }
@@ -208,7 +205,7 @@ function start(options) {
     if (options.startDate == undefined) {
         options.startDate = new Date();
     }
-	options.disableRefresh = options.disableRefresh || 0;
+    options.disableRefresh = options.disableRefresh || 0;
 
     date = new Date(options.startDate.getTime());
     for (day = 0; day < options.days; day++) {
@@ -216,7 +213,7 @@ function start(options) {
         pingData.date = new Date(date.getTime());
         pingData.divid = 'd' + (date.getTime());
         createPlotDivs(pingData.divid);
-        PingAndPlot(pingData);
+        GetPingDataAndPlot(pingData);
         date.setDate(date.getDate() - 1);
     }
 
