@@ -8,7 +8,7 @@ var PingDataType = function () {
 
 var Settings = {
     chartYMax: 500
-}
+};
 
 function getPingFilename(date) {
     return "plot2-" + moment(date).format("YYYY-MM-DD") + ".txt";
@@ -19,7 +19,7 @@ function getPingFilesPath() {
 }
 
 function isToday(date) {
-    return date instanceof Date && moment(date).format('YYYYMMDD') == moment(new Date()).format('YYYYMMDD');
+    return date instanceof Date && moment(date).format('YYYYMMDD') === moment(new Date()).format('YYYYMMDD');
 }
 
 function parsePingData(pingContentsFile, result) {
@@ -47,8 +47,8 @@ function parsePingData(pingContentsFile, result) {
             var parts = line.split(' ');
             pingTimeStamp = extractTimeStamp(parts[0]);
             if (pingTimeStamp instanceof Date) {
-                var val = parseFloat(parts[1], 10)
-                if (val == 0 || val == NaN || !val || val == '') {
+                var val = parseFloat(parts[1], 10);
+                if (val === 0 || isNaN(val) || !val || val === '') {
                     result.nodata.push([pingTimeStamp, Settings.chartYMax]);
                 } else {
                     result.data.push([pingTimeStamp, val]);
@@ -115,9 +115,8 @@ function plotPing(pingData, divid) {
         $(titleDivId).html(moment(pingData.date).format(dateFormat));
     }
 
-  //  console.log($('#' + divid).width())
-
-    if (pingData.data.length == 0) {
+ 
+    if (pingData.data.length === 0) {
         return;
     }
 
@@ -145,7 +144,7 @@ function plotPing(pingData, divid) {
         },
         yaxis: {
             font: {
-                color: "#008928",
+                color: "#008928"
             },
             min: 0, max: Settings.chartYMax
         },
@@ -159,9 +158,9 @@ function plotPing(pingData, divid) {
             shadowColor: "#FF0000"
         },
         colors: ["#00FF00", "#FF0000", "#0000FF"]
-    }
+    };
 
-    if (pingData.plot == undefined) {
+    if (pingData.plot === undefined) {
         pingData.plot = $.plot($('#' + divid), [], options);
         $('#' + divid).bind("plothover", function (event, pos, item) {
             if (item) {
@@ -186,8 +185,8 @@ function plotPing(pingData, divid) {
 
 function start(options) {
 
-    if (options == undefined) {
-        alert("No options passed")
+    if (options === undefined) {
+        alert("No options passed");
         return;
     }
 
@@ -205,7 +204,7 @@ function start(options) {
         }
     }
 
-    if (options.startDate == undefined) {
+    if (options.startDate === undefined) {
         options.startDate = new Date();
     }
 	options.disableRefresh = options.disableRefresh || 0;
