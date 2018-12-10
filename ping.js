@@ -1,11 +1,5 @@
 // Require Jquery, flot, moment, bootstrap
 
-var PingDataType = function () {
-    this.date = null;
-    this.data = [];
-    this.nodata = [];
-};
-
 var Settings = {
     chartYMax: 500
 };
@@ -18,45 +12,52 @@ function getPingFilesPath() {
     return location.protocol + '//' + location.host + "/ping/hier/";
 }
 
-function isToday(date) {
-    return date instanceof Date && moment(date).format('YYYYMMDD') === moment(new Date()).format('YYYYMMDD');
-}
+var PingDataType = function () {
+    this.date = null;
+    this.data = [];
+    this.nodata = [];
 
-function parsePingData(pingContentsFile, result) {
-    // 20181030T153059 
-    // 0123456789012345678
-    function extractTimeStamp(str) {
-        try {
-            var parts = str.split('T');
-            var dateStr = parts[0];
-            var timeStr = parts[1];
-            var date = new Date(parseInt(dateStr.substr(0, 4), 10), parseInt(dateStr.substr(4, 2), 10) - 1, parseInt(dateStr.substr(6, 2), 10),
-                parseInt(timeStr.substr(0, 2), 10), parseInt(timeStr.substr(2, 2), 10), parseInt(timeStr.substr(4, 2), 10));
-            return date;
-        } catch (e) {
-            return null;
-        }
-    }
-
-    var pingTimeStamp = null;
-    result.data = [];
-    result.nodata = [];
-    //console.log( "pingContentsFile "+pingContentsFile);
-    pingContentsFile.split("\n").forEach(function (line) {
-        if (line) {
-            var parts = line.split(' ');
-            pingTimeStamp = extractTimeStamp(parts[0]);
-            if (pingTimeStamp instanceof Date) {
-                var val = parseFloat(parts[1], 10);
-                if (val === 0 || isNaN(val) || !val || val === '') {
-                    result.nodata.push([pingTimeStamp, Settings.chartYMax]);
-                } else {
-                    result.data.push([pingTimeStamp, val]);
-                }
+    this.parsePingData  = function(pingContentsFile) {
+        // 20181030T153059 
+        // 0123456789012345678
+        function extractTimeStamp(str) {
+            try {
+                var parts = str.split('T');
+                var dateStr = parts[0];
+                var timeStr = parts[1];
+                var date = new Date(parseInt(dateStr.substr(0, 4), 10), parseInt(dateStr.substr(4, 2), 10) - 1, parseInt(dateStr.substr(6, 2), 10),
+                    parseInt(timeStr.substr(0, 2), 10), parseInt(timeStr.substr(2, 2), 10), parseInt(timeStr.substr(4, 2), 10));
+                return date;
+            } catch (e) {
+                return null;
             }
         }
-    });
-    return result;
+
+        var pingTimeStamp = null;
+        this.data = [];
+        this.nodata = [];
+        var me = this;
+        //console.log( "pingContentsFile "+pingContentsFile);
+        pingContentsFile.split("\n").forEach(function (line) {
+            if (line) {
+                var parts = line.split(' ');
+                pingTimeStamp = extractTimeStamp(parts[0]);
+                if (pingTimeStamp instanceof Date) {
+                    var val = parseFloat(parts[1], 10);
+                    if (val === 0 || isNaN(val) || !val || val === '') {
+                        me.nodata.push([pingTimeStamp, Settings.chartYMax]);
+                    } else {
+                        me.data.push([pingTimeStamp, val]);
+                    }
+                }
+            }
+        });
+    }
+};
+
+
+function isToday(date) {
+    return date instanceof Date && moment(date).format('YYYYMMDD') === moment(new Date()).format('YYYYMMDD');
 }
 
 function getPingData(date, contextData, onload) {
@@ -95,11 +96,11 @@ function plotPing(pingData, divid) {
     var dateIsToday = isToday(pingData.date);
 
     if (!pingData instanceof PingDataType) {
-        $(titleDivId).html("Invalid data <br>");
+        $(titleDivId).html("not instanceof PingDataType<br>");
         return;
     }
     if (!(pingData.date && pingData.date instanceof Date)) {
-        $(titleDivId).html("Invalid date " + pingData.date + "<br>")
+        $(titleDivId).html("Invalid date '" + pingData.date + "'<br>")
         return;
     }
     if (pingData.data.length < 2) {
@@ -110,13 +111,11 @@ function plotPing(pingData, divid) {
     if (dateIsToday) {
         $(titleDivId).html("Vandaag");
         todayBar.push([new Date(), Settings.chartYMax]);
-
     } else {
         $(titleDivId).html(moment(pingData.date).format(dateFormat));
     }
 
- 
-    if (pingData.data.length === 0) {
+     if (pingData.data.length === 0) {
         return;
     }
 
@@ -179,7 +178,6 @@ function plotPing(pingData, divid) {
     { data: todayBar, bars: { show: true } }]);
     pingData.plot.setupGrid();
     pingData.plot.draw();
-
 }
 
 
@@ -190,11 +188,10 @@ function start(options) {
         return;
     }
 
-
     function PingAndPlot(pingData) {
         getPingData(pingData.date, pingData, function (context, response) {
-            parsePingData(response, context);
-            plotPing(context, context.divid);
+            pingData.parsePingData(response);
+            plotPing(pingData, pingData.divid);
         });
 
         if (!options.disableRefresh && isToday(pingData.date)) {
