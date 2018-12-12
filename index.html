@@ -20,6 +20,8 @@
 
 	<script language="javascript" type="text/javascript" src="moment/moment.js"></script>
 
+	<script src="load.js"></script>
+	<script src="render.js"></script>
 	<script src="ping.js"></script>
 
 	<style>
@@ -80,7 +82,7 @@
 				start(options);
 			});
 
-			if (options.disableMore == 1) {
+			if (options.disableMore > 0) {
 				$("#bottom").hide();
 			}
 

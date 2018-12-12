@@ -183,16 +183,14 @@ function plotPing(pingData, divid) {
 
 function start(options) {
 
-    if (options == undefined) {
-        alert("No options passed")
+    if (options === undefined) {
+        alert("No options passed");
         return;
     }
 
-
-    function GetPingDataAndPlot(pingData) {
-        getPingData(pingData.date, pingData, function (context, response) {
-            parsePingData(response, context);
-            plotPing(context, context.divid);
+    function PingAndPlot(pingData) {
+        pingData.load( function (response) {
+            plotPing(pingData, pingData.divid);
         });
 
         if (!options.disableRefresh && isToday(pingData.date)) {
@@ -202,7 +200,7 @@ function start(options) {
         }
     }
 
-    if (options.startDate == undefined) {
+    if (options.startDate === undefined) {
         options.startDate = new Date();
     }
     options.disableRefresh = options.disableRefresh || 0;
