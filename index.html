@@ -58,13 +58,13 @@
 		function getJsonFromUrl() {
 			var query = location.search.substr(1);
 			var result = {};
-			query.split("&").forEach(function (part) {
+			query.split("&").forEach(function(part) {
 				var item = part.split("=");
 				result[item[0]] = decodeURIComponent(item[1]);
 			});
 			return result;
 		}
-
+		
 
 		$(function () {
 			var options = getJsonFromUrl();
@@ -72,10 +72,10 @@
 			if (options.startDate == undefined) {
 				options.startDate = new Date();
 			}
-			if (options.days !== undefined) {
-				options.days = parseInt(options.days);
+			if (options.days!==undefined) {
+			  options.days  = parseInt( options.days );
 			}
-			options.days = options.days || 5;
+			options.days =  options.days || 5;
 
 			$("#btn-more").click(function () {
 				options.startDate.setDate(options.startDate.getDate() - options.days);
@@ -93,11 +93,11 @@
 
 </head>
 
-	<body>
-		<div id="inner"></div>
-		<div id="bottom">
-			<button id="btn-more" class="btn btn-primary" type="button">More</button>
-		</div>
-	</body>
-
+<body>
+	<div id="inner"></div>
+	<div id="bottom">
+		<button id="btn-more" class="btn btn-primary" type="button">More</button>
+	</div>
+</body>
+   
 </html>

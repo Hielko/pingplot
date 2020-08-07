@@ -15,23 +15,23 @@ function createPlotDivs(divid) {
 }
 
 
-function plotPing(pingData, divid) {
+function plotData(data, divid) {
 
     var titleDivId = "#" + divid + "Title";
     var dateFormat = "dddd DD MMMM YYYY ";
     var todayBar = [];
-    var dateIsToday = isToday(pingData.date);
+    var dateIsToday = isToday(data.date);
 
-    if (!pingData instanceof PingDataType) {
-        $(titleDivId).html("not instanceof PingDataType<br>");
+    if (!data instanceof dataType) {
+        $(titleDivId).html("not instanceof dataType<br>");
         return;
     }
-    if (!(pingData.date && pingData.date instanceof Date)) {
-        $(titleDivId).html("Invalid date '" + pingData.date + "'<br>")
+    if (!(data.date && data.date instanceof Date)) {
+        $(titleDivId).html("Invalid date '" + data.date + "'<br>")
         return;
     }
-    if (pingData.data.length < 2) {
-        $(titleDivId).html(moment(pingData.date).format(dateFormat) + " no data<br>")
+    if (data.data.length < 2) {
+        $(titleDivId).html(moment(data.date).format(dateFormat) + " no data<br>")
         $('#' + divid).hide();
         return;
     }
@@ -39,18 +39,18 @@ function plotPing(pingData, divid) {
         $(titleDivId).html("Vandaag");
         todayBar.push([new Date(), Settings.chartYMax]);
     } else {
-        $(titleDivId).html(moment(pingData.date).format(dateFormat));
+        $(titleDivId).html(moment(data.date).format(dateFormat));
     }
 
-     if (pingData.data.length === 0) {
+     if (data.data.length === 0) {
         return;
     }
 
-    var start = new Date(pingData.date.getTime());
+    var start = new Date(data.date.getTime());
     start.setHours(0);
     start.setMinutes(0);
     start.setSeconds(0);
-    var end = new Date(pingData.date.getTime());
+    var end = new Date(data.date.getTime());
     end.setHours(23);
     end.setMinutes(59);
     end.setSeconds(59);
@@ -86,8 +86,8 @@ function plotPing(pingData, divid) {
         colors: ["#00FF00", "#FF0000", "#0000FF"]
     };
 
-    if (pingData.plot === undefined) {
-        pingData.plot = $.plot($('#' + divid), [], options);
+    if (data.plot === undefined) {
+        data.plot = $.plot($('#' + divid), [], options);
         $('#' + divid).bind("plothover", function (event, pos, item) {
             if (item) {
                 var y = item.datapoint[1].toFixed(0);
@@ -100,9 +100,9 @@ function plotPing(pingData, divid) {
         });
     }
 
-    pingData.plot.setData([{ data: pingData.data },
-    { data: pingData.nodata, bars: { show: true } },
+    data.plot.setData([{ data: data.data },
+    { data: data.nodata, bars: { show: true } },
     { data: todayBar, bars: { show: true } }]);
-    pingData.plot.setupGrid();
-    pingData.plot.draw();
+    data.plot.setupGrid();
+    data.plot.draw();
 }

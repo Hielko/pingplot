@@ -4,20 +4,20 @@ var Settings = {
     chartYMax: 500
 };
 
-function getPingFilename(date) {
+function getFilename(date) {
     return "plot2-" + moment(date).format("YYYY-MM-DD") + ".txt";
 }
 
-function getPingFilesPath() {
-    return location.protocol + '//' + location.host + "/ping/hier/";
+function getFilesPath() {
+    return location.protocol + '//' + location.host + "/ping/hier/" + moment(date).format("YYYY-MM") + "/";
 }
 
-var PingDataType = function () {
+var dataType = function () {
     this.date = null;
     this.data = [];
     this.nodata = [];
 
-    this.parsePingData  = function(pingContentsFile) {
+    this.parsedata  = function(fileContents) {
         // 20181030T153059 
         // 0123456789012345678
         function extractTimeStamp(str) {
@@ -33,21 +33,21 @@ var PingDataType = function () {
             }
         }
 
-        var pingTimeStamp = null;
+        var timeStamp = null;
         this.data = [];
         this.nodata = [];
         var me = this;
-        //console.log( "pingContentsFile "+pingContentsFile);
-        pingContentsFile.split("\n").forEach(function (line) {
+        //console.log( "fileContents "+fileContents);
+        fileContents.split("\n").forEach(function (line) {
             if (line) {
                 var parts = line.split(' ');
-                pingTimeStamp = extractTimeStamp(parts[0]);
-                if (pingTimeStamp instanceof Date) {
+                timeStamp = extractTimeStamp(parts[0]);
+                if (timeStamp instanceof Date) {
                     var val = parseFloat(parts[1], 10);
                     if (val === 0 || isNaN(val) || !val || val === '') {
-                        me.nodata.push([pingTimeStamp, Settings.chartYMax]);
+                        me.nodata.push([timeStamp, Settings.chartYMax]);
                     } else {
-                        me.data.push([pingTimeStamp, val]);
+                        me.data.push([timeStamp, val]);
                     }
                 }
             }
@@ -60,7 +60,7 @@ var PingDataType = function () {
         var xhr = new XMLHttpRequest();
         var me = this;
         xhr.addEventListener("load", function () {
-            me.parsePingData(this.response);
+            me.parsedata(this.response);
             callBack(me);
         }, false);
         xhr.addEventListener("error", function () {
@@ -68,7 +68,7 @@ var PingDataType = function () {
             callBack(me);
         }, false);
     
-        var url = getPingFilesPath() + getPingFilename(date);
+        var url = getFilesPath() + getFilename(date);
         xhr.open('GET', url, true);
         xhr.send();
     }
